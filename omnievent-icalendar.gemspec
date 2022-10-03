@@ -33,4 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "omnievent"
   spec.add_dependency "open-uri"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "webmock"
 end

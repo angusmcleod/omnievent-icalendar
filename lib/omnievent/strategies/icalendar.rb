@@ -2,6 +2,7 @@
 
 require_relative "../../omnievent/icalendar/version"
 require "icalendar"
+require "open-uri"
 require "addressable/uri"
 
 module OmniEvent

@@ -3,6 +3,7 @@
 require "omnievent"
 require_relative "../lib/omnievent/icalendar"
 require "byebug"
+require "webmock/rspec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -10,7 +10,7 @@ Lint/ConstantDefinitionInBlock:
 
 Metrics/BlockLength:
   Exclude:
-    - 'omnievent.gemspec'
+    - 'omnievent-icalendar.gemspec'
     - 'spec/**/*.rb'
 
 Metrics/MethodLength:
