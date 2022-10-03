@@ -1,10 +1,10 @@
 # OmniEvent iCalendar (Pre Release)
 
+> Please note that this gem is pre release and is not yet ready for production.
+
 This gem contains a generic iCalendar strategy for [OmniEvent](https://github.com/paviliondev/omnievent).
 
 ## Installation
-
-> Please note that this gem is pre release and is not yet ready for production.
 
 First install [OmniEvent](https://rubygems.org/gems/omnievent).
 
@@ -15,8 +15,6 @@ Then install this gem:
     $ gem install omnievent-icalendar
 
 ## Usage
-
-> Please note that this gem is pre release and is not yet ready for production.
 
 Please see ["Usage" in the OmniEvent Readme](https://github.com/paviliondev/omnievent#usage)
 
