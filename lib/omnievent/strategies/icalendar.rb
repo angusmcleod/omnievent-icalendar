@@ -2,6 +2,7 @@
 
 require_relative "../../omnievent/icalendar/version"
 require "icalendar"
+require "icalendar-recurrence"
 require "open-uri"
 require "addressable/uri"
 
@@ -14,6 +15,7 @@ module OmniEvent
       include OmniEvent::Strategy
 
       option :name, "icalendar"
+      option :expand_recurrences
       option :uri, ""
 
       def raw_events
@@ -30,6 +32,28 @@ module OmniEvent
         result = []
         calendars.each do |calendar|
           result += calendar.events
+        end
+
+        if options.expand_recurrences
+          result = result.reduce([]) do |res, event|
+            schedule = ::Icalendar::Recurrence::Schedule.new(event)
+
+            if options.from_time && options.to_time
+              occurrences = schedule.occurrences_between(options.from_time, options.to_time)
+            else
+              occurrences = schedule.all_occurrences
+            end
+
+            occurrences.each do |occurrence|
+              occurrence_event = event.clone
+              occurrence_event.recurrence_id = occurrence.start_time
+              occurrence_event.dtstart = occurrence.start_time
+              occurrence_event.dtend = occurrence.end_time
+              res << occurrence_event
+            end
+
+            res
+          end
         end
 
         result
@@ -49,7 +73,10 @@ module OmniEvent
           taxonomies: raw_event.categories.to_s,
           status: convert_status(raw_event.status),
           created_at: format_time(raw_event.created),
-          updated_at: format_time(raw_event.last_modified)
+          updated_at: format_time(raw_event.last_modified),
+          sequence: raw_event.sequence.to_s,
+          series_id: raw_event.uid.to_s,
+          occurrence_id: raw_event.recurrence_id.to_s,
         }
 
         OmniEvent::EventHash.new(

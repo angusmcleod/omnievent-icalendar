@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "addressable", "~> 2.7"
   spec.add_dependency "icalendar"
+  spec.add_dependency "icalendar-recurrence", "~> 1.1"
   spec.add_dependency "omnievent"
   spec.add_dependency "open-uri"
   spec.add_development_dependency "byebug"
