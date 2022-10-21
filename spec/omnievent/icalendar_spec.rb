@@ -2,6 +2,7 @@
 
 RSpec.describe OmniEvent::Icalendar do
   let(:ical_file) { File.join(File.expand_path("..", __dir__), "fixtures", "calendar.ics") }
+  let(:local_uri) { "file://#{ical_file}" }
 
   before do
     OmniEvent::Builder.new do
@@ -10,8 +11,6 @@ RSpec.describe OmniEvent::Icalendar do
   end
 
   describe "list_events" do
-    let(:local_uri) { "file://#{ical_file}" }
-
     it "returns an event list" do
       events = OmniEvent.list_events(:icalendar, uri: local_uri)
 
@@ -46,6 +45,17 @@ RSpec.describe OmniEvent::Icalendar do
 
         expect(events.size).to eq(1)
         expect(events).to all(be_kind_of(OmniEvent::EventHash))
+      end
+    end
+
+    context "with recurrence" do
+      it "expands recurrences" do
+        events = OmniEvent.list_events(:icalendar, uri: local_uri, expand_recurrences: true)
+
+        expect(events.size).to eq(5)
+        expect(events.last.data.start_time).to eq("1997-07-18T17:00:00+00:00")
+        expect(events.last.data.end_time).to eq("1997-07-19T04:00:00+00:00")
+        expect(events.last.metadata.occurrence_id).to eq("1997-07-18T17:00:00+00:00")
       end
     end
   end
