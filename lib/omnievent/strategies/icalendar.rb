@@ -35,25 +35,7 @@ module OmniEvent
         end
 
         if options.expand_recurrences
-          result = result.reduce([]) do |res, event|
-            schedule = ::Icalendar::Recurrence::Schedule.new(event)
-
-            if options.from_time && options.to_time
-              occurrences = schedule.occurrences_between(options.from_time, options.to_time)
-            else
-              occurrences = schedule.all_occurrences
-            end
-
-            occurrences.each do |occurrence|
-              occurrence_event = event.clone
-              occurrence_event.recurrence_id = occurrence.start_time
-              occurrence_event.dtstart = occurrence.start_time
-              occurrence_event.dtend = occurrence.end_time
-              res << occurrence_event
-            end
-
-            res
-          end
+          result = expand_recurrences(result)
         end
 
         result
@@ -76,7 +58,7 @@ module OmniEvent
           updated_at: format_time(raw_event.last_modified),
           sequence: raw_event.sequence.to_s,
           series_id: raw_event.uid.to_s,
-          occurrence_id: raw_event.recurrence_id.to_s,
+          occurrence_id: raw_event.recurrence_id.to_s
         }
 
         OmniEvent::EventHash.new(
@@ -121,6 +103,26 @@ module OmniEvent
           "cancelled"
         else
           "published"
+        end
+      end
+
+      def expand_recurrences(events)
+        events.each_with_object([]) do |event, res|
+          schedule = ::Icalendar::Recurrence::Schedule.new(event)
+
+          occurrences = if options.from_time && options.to_time
+                          schedule.occurrences_between(options.from_time, options.to_time)
+                        else
+                          schedule.all_occurrences
+                        end
+
+          occurrences.each do |occurrence|
+            occurrence_event = event.clone
+            occurrence_event.recurrence_id = occurrence.start_time
+            occurrence_event.dtstart = occurrence.start_time
+            occurrence_event.dtend = occurrence.end_time
+            res << occurrence_event
+          end
         end
       end
     end
