@@ -4,7 +4,7 @@ PATH
     omnievent-icalendar (0.1.0.pre1)
       addressable (~> 2.7)
       icalendar
-      icalendar-recurrence
+      icalendar-recurrence (~> 1.1)
       omnievent
       open-uri
 
@@ -30,7 +30,7 @@ GEM
     ice_cube (0.16.4)
     iso-639 (0.3.5)
     json (2.6.2)
-    omnievent (0.1.0.pre1)
+    omnievent (0.1.0.pre3)
       hashie (>= 3.4.6)
       iso-639 (~> 0.3.5)
       tzinfo (~> 2.0)
