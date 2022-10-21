@@ -34,9 +34,7 @@ module OmniEvent
           result += calendar.events
         end
 
-        if options.expand_recurrences
-          result = expand_recurrences(result)
-        end
+        result = expand_recurrences(result) if options.expand_recurrences
 
         result
       end
@@ -50,21 +48,10 @@ module OmniEvent
           url: raw_event.url.to_s
         }
 
-        metadata = {
-          uid: format_uid(raw_event),
-          taxonomies: raw_event.categories.to_s,
-          status: convert_status(raw_event.status),
-          created_at: format_time(raw_event.created),
-          updated_at: format_time(raw_event.last_modified),
-          sequence: raw_event.sequence.to_s,
-          series_id: raw_event.uid.to_s,
-          occurrence_id: raw_event.recurrence_id.to_s
-        }
-
         OmniEvent::EventHash.new(
           provider: name,
           data: data,
-          metadata: metadata
+          metadata: retrieve_metadata(raw_event)
         )
       end
 
@@ -83,6 +70,28 @@ module OmniEvent
         when "file"
           File.read(uri.path)
         end
+      end
+
+      def retrieve_metadata(event)
+        metadata = {
+          uid: format_uid(event),
+          taxonomies: event.categories.to_s,
+          status: convert_status(event.status),
+          created_at: format_time(event.created),
+          updated_at: format_time(event.last_modified),
+          sequence: nil,
+          series_id: nil,
+          occurrence_id: nil
+        }
+
+        metadata[:sequence] = event.sequence.to_s if event.sequence
+
+        if event.recurrence_id
+          metadata[:series_id] = event.uid.to_s
+          metadata[:occurrence_id] = event.recurrence_id.to_s
+        end
+
+        metadata
       end
 
       def format_uid(event)
