@@ -17,11 +17,17 @@ jobs:
           - '2.7.6'
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Ruby
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Run the default task
-      run: bundle exec rake
+
+    - name: Rubocop
+      run: bundle exec rubocop .
+
+    - name: Rspec
+      run: bundle exec rspec .
