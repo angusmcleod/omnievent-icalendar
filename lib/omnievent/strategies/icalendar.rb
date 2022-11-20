@@ -95,10 +95,8 @@ module OmniEvent
       end
 
       def format_uid(event)
-        # See https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.4.4
         event_uid = event.uid.to_s
         event_uid += "#{options.uid_delimiter}#{event.recurrence_id}" if event.recurrence_id
-        event_uid += "#{options.uid_delimiter}#{event.sequence}" if event.sequence
         event_uid
       end
 
@@ -116,23 +114,53 @@ module OmniEvent
       end
 
       def expand_recurrences(events)
-        events.each_with_object([]) do |event, res|
-          schedule = ::Icalendar::Recurrence::Schedule.new(event)
+        result = []
 
-          occurrences = if options.from_time && options.to_time
-                          schedule.occurrences_between(options.from_time, options.to_time)
-                        else
-                          schedule.all_occurrences
-                        end
+        events.each do |event|
+          if recurrence?(event)
+            schedule = ::Icalendar::Recurrence::Schedule.new(event)
+            exceptions = events.select { |e| e.recurrence_id && (e.uid == event.uid) }
 
-          occurrences.each do |occurrence|
-            occurrence_event = event.clone
-            occurrence_event.recurrence_id = occurrence.start_time
-            occurrence_event.dtstart = occurrence.start_time
-            occurrence_event.dtend = occurrence.end_time
-            res << occurrence_event
+            extract_occurences(schedule).each do |occurrence|
+              next if exception?(exceptions, occurrence)
+
+              occurrence_event = event.clone
+              occurrence_event.recurrence_id = occurrence.start_time
+              occurrence_event.dtstart = occurrence.start_time
+              occurrence_event.dtend = occurrence.end_time
+
+              result << occurrence_event
+            end
+          else
+            siblings = events
+                       .select { |e| e.recurrence_id.to_i == event.recurrence_id.to_i }
+                       .sort_by(&:sequence)
+
+            result << event if siblings.none? || (siblings.last.sequence == event.sequence)
           end
         end
+
+        result.sort_by(&:dtstart)
+      end
+
+      def extract_occurences(schedule)
+        if options.from_time && options.to_time
+          schedule.occurrences_between(options.from_time, options.to_time)
+        else
+          schedule.all_occurrences
+        end
+      end
+
+      def recurrence?(event)
+        present?(event.rrule) || present?(event.rdate)
+      end
+
+      def present?(property)
+        !!property && property.any?
+      end
+
+      def exception?(exceptions, occurrence)
+        exceptions.any? { |e| e.recurrence_id.to_i == occurrence.start_time.to_i }
       end
     end
   end
