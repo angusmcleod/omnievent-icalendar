@@ -32,7 +32,7 @@ RSpec.describe OmniEvent::Icalendar do
       events = OmniEvent.list_events(:icalendar, uri: local_uri(calendar))
 
       expect(events.size).to eq(2)
-      expect(events.first.metadata.created_at).to eq("1996-03-29T13:30:00+00:00")
+      expect(events.first.metadata.created_at).to eq("1996-03-29T13:30:00Z")
     end
 
     context "with remote ics" do
