@@ -133,7 +133,7 @@ module OmniEvent
             end
           else
             siblings = events
-                       .select { |e| e.recurrence_id.to_i == event.recurrence_id.to_i }
+                       .select { |e| e.recurrence_id && (e.recurrence_id.to_i == event.recurrence_id.to_i) }
                        .sort_by(&:sequence)
 
             result << event if siblings.none? || (siblings.last.sequence == event.sequence)
