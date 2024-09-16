@@ -28,10 +28,10 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "addressable", "~> 2.7"
-  spec.add_dependency "icalendar"
-  spec.add_dependency "icalendar-recurrence", "~> 1.1"
   spec.add_dependency "omnievent"
+  spec.add_development_dependency "addressable", "~> 2.7"
+  spec.add_development_dependency "icalendar"
+  spec.add_development_dependency "icalendar-recurrence", "~> 1.1"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "webmock"
 end
