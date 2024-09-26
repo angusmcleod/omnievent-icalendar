@@ -14,6 +14,8 @@ module OmniEvent
 
       include OmniEvent::Strategy
 
+      DEFAULT_COUNT = 10
+
       option :name, "icalendar"
       option :expand_recurrences
       option :uri, ""
@@ -144,11 +146,10 @@ module OmniEvent
       end
 
       def extract_occurences(schedule)
-        if options.from_time && options.to_time
-          schedule.occurrences_between(options.from_time, options.to_time)
-        else
-          schedule.all_occurrences
-        end
+        return schedule.occurrences_between(options.from_time, options.to_time) if options.from_time && options.to_time
+
+        schedule.rrules.first.count = DEFAULT_COUNT if !schedule.rrules.first.count && !schedule.rrules.first.until
+        schedule.all_occurrences
       end
 
       def recurrence?(event)

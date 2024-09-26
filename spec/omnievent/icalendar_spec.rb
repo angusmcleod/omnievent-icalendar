@@ -52,21 +52,34 @@ RSpec.describe OmniEvent::Icalendar do
     end
 
     context "with recurrence" do
-      let(:recurring_event) { File.join(File.expand_path("..", __dir__), "fixtures", "calendar_recurring_event.ics") }
+      context "with a count" do
+        let(:recurring_event) do
+          File.join(File.expand_path("..", __dir__), "fixtures", "calendar_recurring_event_with_count.ics")
+        end
 
-      it "expands recurrences" do
-        events = OmniEvent.list_events(:icalendar, uri: local_uri(recurring_event), expand_recurrences: true)
+        it "expands recurrences" do
+          events = OmniEvent.list_events(:icalendar, uri: local_uri(recurring_event), expand_recurrences: true)
 
-        expect(events.size).to eq(5)
-        expect(events.last.data.start_time).to eq("1997-07-18T15:00:00+00:00")
-        expect(events.last.data.end_time).to eq("1997-07-19T02:00:00+00:00")
+          expect(events.size).to eq(5)
+          expect(events.last.data.start_time).to eq("1997-07-18T15:00:00+00:00")
+          expect(events.last.data.end_time).to eq("1997-07-19T02:00:00+00:00")
+        end
+
+        it "handles series_ids, occurrence_ids and sequences correctly" do
+          events = OmniEvent.list_events(:icalendar, uri: local_uri(recurring_event), expand_recurrences: true)
+
+          expect(events.map { |e| e.metadata.series_id }.uniq.size).to eq(1)
+          expect(events.map { |e| e.metadata.occurrence_id }.uniq.size).to eq(5)
+        end
       end
 
-      it "handles series_ids, occurrence_ids and sequences correctly" do
-        events = OmniEvent.list_events(:icalendar, uri: local_uri(recurring_event), expand_recurrences: true)
+      context "without a count" do
+        let(:recurring_event) { File.join(File.expand_path("..", __dir__), "fixtures", "calendar_recurring_event.ics") }
 
-        expect(events.map { |e| e.metadata.series_id }.uniq.size).to eq(1)
-        expect(events.map { |e| e.metadata.occurrence_id }.uniq.size).to eq(5)
+        it "applies the default count" do
+          events = OmniEvent.list_events(:icalendar, uri: local_uri(recurring_event), expand_recurrences: true)
+          expect(events.size).to eq(OmniEvent::Strategies::Icalendar::DEFAULT_COUNT)
+        end
       end
     end
   end

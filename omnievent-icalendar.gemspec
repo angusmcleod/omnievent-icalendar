@@ -30,8 +30,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "omnievent"
   spec.add_development_dependency "addressable", "~> 2.7"
+  spec.add_development_dependency "byebug"
   spec.add_development_dependency "icalendar"
   spec.add_development_dependency "icalendar-recurrence", "~> 1.1"
-  spec.add_development_dependency "byebug"
   spec.add_development_dependency "webmock"
 end
